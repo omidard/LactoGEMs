@@ -1,0 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 15 22:22:07 2022
+
+@author: omidard
+"""
+from dgap import scan,tempfind,gaps,zx,fluxanalyze
+import multiprocessing as mp
+
+
+#address to directories
+dir1='/home/omidard/allgems/inhouse'
+
+
+output = scan(dir1)
+all_gems=output[0]
+failed=output[1]
+temps=output[2]
+temps_inf = tempfind(all_gems,failed,temps)
+temp_name = temps_inf['id'][0]
+allmissing = gaps(failed,temps_inf)
+out = zx(allmissing)
+xlist = out[0]
+modelsz= out[1]
+allgapz=[]
+for i in xlist:
+    gapz=[]
+    pool = mp.Pool(mp.cpu_count())
+    tar = pool.map(fluxanalyze, [reaction for reaction in i])
+    gapz.append(tar)
+    allgapz.append(gapz)
